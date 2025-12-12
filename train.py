@@ -60,7 +60,7 @@ dataset = Dataset.from_dict({
     "text": [open(os.path.join("viet_dataset", f.rsplit('.', 1)[0] + '.txt'), "r", encoding="utf-8").read().strip() for f in image_files]
 })
 
-#  Fine-Tune LoRA Trên GPU batch 16, 1000 steps
+#  Fine-Tune LoRA Trên GPU batch 16, số steps = dataset/batch size
 accelerator = Accelerator(mixed_precision="fp16", gradient_accumulation_steps=4)
 
 pipe = StableDiffusionXLPipeline.from_pretrained(
@@ -84,7 +84,7 @@ pipe.unet, dataloader = accelerator.prepare(pipe.unet, dataloader)
 optimizer = torch.optim.AdamW(pipe.unet.parameters(), lr=1e-4)
 
 pipe.unet.train()
-for epoch in range(5):  # 5 epochs x 1000 steps = 5000 steps, điều chỉnh nếu cần
+for epoch in range(5):  # 5 epochs 
     for step, batch in enumerate(dataloader):
         with accelerator.accumulate(pipe.unet):
             # Preprocess image
